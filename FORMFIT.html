@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FormFit - Workout App by Tejas</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- React & ReactDOM CDNs -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <!-- Babel for JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans antialiased selection:bg-orange-500 selection:text-white">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    const EXERCISES_DATA = [
+      // ================= CHEST (10) =================
+      {
+        id: 'c_01',
+        name: 'Barbell Bench Press',
+        muscle: 'Chest',
+        secondary: ['Triceps', 'Shoulders'],
+        equipment: 'Barbell & Bench',
+        difficulty: 'Intermediate',
+        instructions: [
+          'Lie flat on the bench with eyes directly under the bar.',
+          'Grip the bar slightly wider than shoulder-width apart.',
+          'Unrack the bar and lower it smoothly to your mid-chest.',
+          'Drive your feet into the floor and press the bar back up to full extension.'
+        ],
+        tips: 'Keep your shoulder blades retracted and maintain a stable arch in your lower back.'
+      },
+      {
+        id: 'c_02',
+        name: 'Incline Dumbbell Fly',
+        muscle: 'Chest',
+        secondary: ['Anterior Deltoids'],
+        equipment: 'Dumbbells & Incline Bench',
+        difficulty: 'Beginner',
+        instructions: [
+          'Set an incline bench to 30-45 degrees and hold dumbbells above your chest.',
+          'Maintain a slight, fixed bend in your elbows throughout the movement.',
+          'Open your arms in a wide arc until you feel a deep stretch in your chest.',
+          'Squeeze your chest to bring the dumbbells back together at the top.'
+        ],
+        tips: 'Do not let the weights touch at the top; keep constant tension on the pectoral muscles.'
+      },
+      {
+        id: 'c_03',
+        name: 'Decline Barbell Bench Press',
+        muscle: 'Chest',
+        secondary: ['Triceps', 'Lower Pectorals'],
+        equipment: 'Decline Bench & Barbell',
+        difficulty: 'Intermediate',
+        instructions: [
+          'Secure your feet at the top of a decline bench and lie back.',
+          'Grip the barbell slightly wider than shoulder-width and unrack.',
+          'Lower the bar down to your lower chest/upper abdomen with control.',
+          'Press the weight straight back up to full arm extension.'
+        ],
+        tips: 'Ensure your legs are fully secured before un-racking any heavy weight.'
+      },
+      {
+        id: 'c_04',
+        name: 'Cable Crossover',
+        muscle: 'Chest',
+        secondary: ['Front Deltoids'],
+        equipment: 'Cable Machine',
+        difficulty: 'Intermediate',
+        instructions: [
+          'Set pulleys to high positions and grab handles with a slight bend in your elbows.',
+          'Step forward slightly with one foot for stability and lean forward from the hips.',
+          'Pull handles down and across your body in a hugging motion until hands meet.',
+          'Return slowly to the starting position feeling a stretch across your chest.'
+        ],
+        tips: 'Cross your hands slightly over each other at peak contraction for maximum squeeze.'
+      },
+      {
+        id: 'c_05',
+        name: 'Push-Up',
+        muscle: 'Chest',
+        secondary: ['Triceps', 'Core', 'Shoulders'],
+        equipment: 'Bodyweight',
+        difficulty: 'Beginner',
+        instructions: [
+          'Get into a high plank position with hands slightly wider than shoulder-width.',
+          'Keep your body in a straight line from head to heels with your core braced.',
+          'Lower your chest to the floor by bending your elbows at a 45-degree angle.',
+          'Push ground away to return to the top position.'
+        ],
+        tips: 'Do not let your hips sag or flare your elbows straight out to the sides.'
+      },
+      {
+        id: 'c_06',
+        name: 'Flat Dumbbell Bench Press',
+        muscle: 'Chest',
+        secondary: ['Triceps', 'Shoulders'],
+        equipment: 'Dumbbells & Bench',
+        difficulty: 'Beginner',
+        instructions: [
+          'Lie flat on a bench holding dumbbells at chest level with palms facing forward.',
+          'Press the dumbbells straight up until your arms are fully extended over your chest.',
+          'Lower the dumbbells slowly with control until they are level with your chest.',
+          'Press back up, slightly converging the weights at the top.'
+        ],
+        tips: 'Keep your wrists straight and stable directly above your elbows.'
+      },
+      {
+        id: 'c_07',
+        name: 'Incline Barbell Bench Press',
+        muscle: 'Chest',
+        secondary: ['Anterior Deltoids', 'Triceps'],
+        equipment: 'Incline Bench & Barbell',
+        difficulty: 'Intermediate',
+        instructions: [
+          'Set an incline bench between 30 and 45 degrees.',
+          'Grip the barbell slightly wider than shoulder-width and unrack.',
+          'Lower the bar to your upper chest with complete control.',
+          'Press the bar upward and slightly back toward your face.'
+        ],
+        tips: 'Focus on targeting your upper chest fibers by keeping your chest proud.'
+      },
+      {
+        id: 'c_08',
+        name: 'Pec Deck Machine',
+        muscle: 'Chest',
+        secondary: ['Anterior Deltoids'],
+        equipment: 'Pec Deck Machine',
+        difficulty: 'Beginner',
+        instructions: [
+          'Sit down and adjust the seat so your elbows are at mid-chest height.',
+          'Press your forearms flat against the pads or hold the handles securely.',
+          'Bring your arms together in a smooth arc, squeezing your chest at the center.',
+          'Return slowly to the starting position until a stretch is felt.'
+        ],
+        tips: 'Do not let weights slam back down between repetitions.'
+      },
+      {
+        id: 'c_09',
+        name: 'Dumbbell Pullover',
+        muscle: 'Chest',
+        secondary: ['Lats', 'Serratus'],
+        equipment: 'Dumbbell & Bench',
+        difficulty: 'Intermediate',
+        instructions: [
+          'Lie across a flat bench with only your upper back resting on it, feet flat on the floor.',
+          'Hold a single dumbbell with both hands directly above your chest.',
+          'Keeping a slight bend in your elbows, lower the dumbbell in an arc backward behind your head.',
+          'Pull the dumbbell back over your chest using your chest and lats.'
+        ],
+        tips: 'Keep your hips dropped slightly low to maximize the chest and ribcage expansion.'
+      },
+      {
+        id: 'c_10',
+        name: 'Chest Dip',
+        muscle: 'Chest',
+        secondary: ['Triceps', 'Front Deltoids'],
+        equipment: 'Parallel Bars',
+        difficulty: 'Advanced',
+        instructions: [
+          'Grab parallel bars, jump up to support your weight with arms locked out.',
+          'Lean your torso forward about 15-30 degrees and flare your elbows out slightly.',
+          'Lower your body until your shoulders drop below your elbow level.',
+          'Press back up to the starting position.'
+        ],
+        tips: 'Leaning forward shifts the load from your triceps onto your lower chest.'
+      },
+
+      // ================= LEGS (10) =================
+      {
+        id: 'l_01',
+        name: 'Barbell Back Squat',
+        muscle: 'Legs',
+        secondary: ['Glutes', 'Core', 'Hamstrings'],
+        equipment: 'Barbell & Rack',
+        difficulty: 'Advanced',
+        instructions: [
+          'Position the barbell across your upper back (traps) and unrack.',
+          'Stand with feet shoulder-width apart, toes pointed slightly outward.',
+          'Break at your hips and knees simultaneously, lowering your hips back and down.',
+          'Push through your entire foot to drive back up to the starting position.'
+        ],
+        tips: 'Keep your chest up, core braced tight, and knees tracking in line with your toes.'
+      },
+      {
+        id: 'l_02',
+        name: 'Romanian Deadlift',
+        muscle: 'Legs',
+        secondary: ['Glutes', 'Lower Back'],
+        equipment: 'Barbell or Dumbbells',
+        difficulty: 'Intermediate',
+        instructions: [
+          'Hold weight in front of your thighs with a shoulder-width grip.',
+          'Keep a soft bend in your knees and push your hips straight back.',
+          'Lower the weight along your shins until you feel a strong stretch in your hamstrings.',
+          'Drive your hips forward to return to the upright standing position.'
+        ],
+        tips: 'Keep your spine neutral and the weight close to your legs the entire time.'
+      },
+      {
+        id: 'l_03',
+        name: 'Bulgarian Split Squat',
+        muscle: 'Legs',
+        secondary: ['Quads', 'Glutes'],
+        equipment: 'Dumbbells & Bench',
+        difficulty: 'Advanced',
+        instructions: [
+          'Stand about two feet in front of a bench, facing away, and place the top of one foot behind you.',
+          'Hold dumbbells at your sides and lower your hips until your rear knee is just above the floor.',
+          'Drive upward through the heel of your front foot to return to the starting position.',
+          'Complete all reps on one leg before switching.'
+        ],
+        tips: 'Keep your torso upright and your front knee aligned over your mid-foot.'
+      },
+      {
+        id: 'l_04',
+        name: 'Standing Calf Raise',
+        muscle: 'Legs',
+        secondary: ['Calves'],
+        equipment: 'Bodyweight or Machine',
+        difficulty: 'Beginner',
+        instructions: [
+          'Stand on the edge of a step or platform with your heels hanging off the back.',
+          'Raise your heels as high as possible onto your toes, squeezing your calves at the top.',
+          'Slowly lower your heels below platform level to get a full stretch.'
+        ],
+        tips: 'Pause for one full second at the top of the contraction for maximum growth.'
+      },
+      {
+        id: 'l_05',
+        name: 'Leg Press',
+        muscle: 'Legs',
+        secondary: ['Quads', 'Glutes'],
+        equipment: 'Leg Press Machine',
+        difficulty: 'Beginner',
+        instructions: [
+          'Sit on the machine with your back flat against the pad and feet shoulder-width on the platform.',
+          'Release safety catches and lower the platform smoothly toward you until knees form a 90-degree angle.',
+          'Press platform back up using your heels and mid-foot, avoiding complete knee lockouts.'
+        ],
+        tips: 'Never let your lower back round or lift off the pad at the bottom of the movement.'
+      },
+      {
+        id: 'l_06',
+        name: 'Seated Leg Curl',
+        muscle: 'Legs',
+        secondary: ['Hamstrings'],
+        equipment: 'Leg Curl Machine',
+        difficulty: 'Beginner',
+        instructions: [
+          'Sit on the machine with pad resting against the back of your lower calves just above the heels.',
+          'Secure the lap pad firmly across your thighs.',
+          'Flex your knees to pull the lever downward as far as possible, squeezing hamstrings.',
+          'Return slowly to the starting position with control.'
+        ],
+        tips: 'Avoid lifting your hips off the seat during the curl motion.'
+      },
+      {
+        id: 'l_07',
+        name: 'Barbell Front Squat',
+        muscle: 'Legs',
+        secondary: ['Quads', 'Core'],
+        equipment: 'Barbell & Rack',
+        difficulty: 'Advanced',
+        instructions: [
+          'Rest the barbell across your front deltoids with elbows high and arms crossed or fingers hooked.',
+          'Unrack and stand with feet shoulder-width apart.',
+          'Squat down deeply, keeping an exceptionally upright torso and chest lifted.',
+          'Drive straight back up through your heels.'
+        ],
+        tips: 'Keeping your elbows high prevents the bar from rolling forward.'
+      },
+      {
+        id: 'l_08',
+        name: 'Walking Lunge',
+        muscle: 'Legs',
+        secondary: ['Glutes', 'Quads', 'Core'],
+        equipment: 'Dumbbells or Bodyweight',
+        difficulty: 'Intermediate',
+        instructions: [
+          'Hold dumbbells at your sides and stand tall.',
+          'Step forward with one leg and lower your hips until both knees are bent at 90 degrees.',
+          'Push off your front foot to step forward into the next lunge.',
+          'Alternate legs continuously for the set duration or distance.'
+        ],
+        tips: 'Keep your torso upright and do not let your front knee drift past your toes.'
+      },
+      {
+        id: 'l_09',
+        name: 'Leg Extension',
+        muscle: 'Legs',
+        secondary: ['Quads'],
+        equipment: 'Leg Extension Machine',
+        difficulty: 'Beginner',
+        instructions: [
+          'Sit on the machine with your back against the backrest and ankles resting behind the pad.',
+          'Extend your legs outward until they are completely straight, flexing your quads at the top.',
+          'Lower the weight back down slowly under control.'
+        ],
+        tips: 'Avoid using explosive momentum on the way up; control the eccentric phase.'
+      },
+      {
+        id: 'l_10',
+        name: 'Seated Calf Raise',
+        muscle: 'Legs',
+        secondary: ['Soleus'],
+        equipment: 'Seated Calf Machine',
+        difficulty: 'Beginner',
+        instructions: [
+          'Sit on the machine with the knee pad resting on your lower thighs just above the knees.',
+          'Place the balls of your feet on the foot platform with heels hanging off.',
+          'Lower your heels for a deep stretch, then press up onto your toes as high as possible.',
+          'Return with controlled movement.'
+        ],
+        tips: 'Seated calf raises target the soleus muscle more effectively than standing variations.'
+      },
+
+      // ================= BACK (10) =================
+      {
+        id: 'b_01',
+        name: 'Pull-Up',
+        muscle: 'Back',
+        secondary: ['Biceps', 'Rear Deltoids'],
+        equipment: 'Pull-up Bar',
+        difficulty: 'Intermediate',
+        instructions: [
+          'Grab the pull-up bar with an overhand grip wider than shoulder-width.',
+          'Hang fully with arms extended and core engaged.',
+          'Drive your elbows down and back to pull your chest up to the bar.',
+          'Lower yourself back down with control into a full hang.'
+        ],
+        tips: 'Avoid swinging or using momentum; focus on initiating the pull with your lats.'
+      },
+      {
+        id: 'b_02',
+        name: 'Barbell Bent-Over Row',
+        muscle: 'Back',
+        secondary: ['Biceps', 'Rear Deltoids', 'Lower Back'],
+        equipment: 'Barbell',
+        difficulty: 'Intermediate',
+        instructions: [
+          'Hold a barbell with an overhand grip, hinge forward at the hips to about a 45-degree angle.',
+          'Keep your spine completely neutral and core braced.',
+          'Pull the barbell up toward your lower abdomen or belly button.',
+          'Lower the bar slowly back to the starting stretch position.'
+        ],
+        tips: 'Do not jerk the weight up using body momentum; keep your torso rigid.'
+      },
+      {
+        id: 'b_03',
+        name: 'Lat Pulldown',
+        muscle: 'Back',
+        secondary: ['Biceps'],
+        equipment: 'Cable Lat Pulldown Machine',
+        difficulty: 'Beginner',
+        instructions: [
+          'Sit down at the lat pulldown station and adjust the knee pad to secure your legs.',
+          'Grab the bar with a wide overhand grip.',
+          'Lean back slightly, pull your chest up, and pull the bar down toward your upper chest.',
+          'Slowly control the bar back up to the fully extended top position.'
+        ],
+        tips: 'Lead the movement by driving your elbows down toward your pockets.'
+      },
+      {
+        id: 'b_04',
+        name: 'Seated Cable Row',
+        muscle: 'Back',
+        secondary: ['Biceps', 'Rhomboids'],
+        equipment: 'Cable Row Machine',
+        difficulty: 'Beginner',
+        instructions: [
+          'Sit on the bench with feet placed firmly on the footplates and knees slightly bent.',
+          'Grab the handle attachment, sit tall with a straight back.',
+          'Pull the handle into your lower abdomen while retracting your shoulder blades.',
+          'Extend your arms forward under control to feel a stretch in your lats.'
+        ],
+        tips: 'Avoid excessive forward and backward swinging of your torso.'
+      },
+      {
+        id: 'b_05',
+        name: 'Single-Arm Dumbbell Row',
+        muscle: 'Back',
+        secondary: ['Biceps', 'Core'],
+        equipment: 'Dumbbell & Bench',
+        difficulty: 'Beginner',
+        instructions: [
+          'Place your left knee and left hand flat on a bench, keeping your torso parallel to the floor.',
+          'Hold a dumbbell in your right hand with arm hanging straight down.',
+          'Pull the dumbbell up toward your hip, keeping your elbow close to your body.',
+          'Lower the weight back down with control.'
+        ],
+        tips: 'Keep your shoulders square and avoid rotating your torso as you lift.'
+      },
+      {
+        id: 'b_06',
+        name: 'T-Bar Row',
+        muscle: 'Back',
+        secondary: ['Biceps', 'Traps'],
+        equipment: 'T-Bar Row Machine or Landmine',
+        difficulty: 'Intermediate',
+        instructions: [
+          'Straddle the bar, bend at your hips with a flat back, and grip the handles.',
+          'Brace your core and pull the weight upward until the plates touch your chest.',
+          'Lower the weight back down with a controlled movement, stretching your mid-back.'
+        ],
+        tips: 'Keep your chest supported against the pad if using a machine variant.'
+      },
+      {
+        id: 'b_07',
+        name: 'Straight-Arm Cable Pulldown',
+        muscle: 'Back',
+        secondary: ['Triceps', 'Serratus'],
+        equipment: 'Cable Machine',
+        difficulty: 'Beginner',
+        instructions: [
+          'Attach a straight bar or rope to a high cable pulley.',
+          'Take a step back, hinge forward slightly at the hips, keeping arms straight with a soft elbow bend.',
+          'Pull the bar down in an arc toward your thighs, engaging your lats.',
+          'Return slowly back up to eye level.'
+        ],
+        tips: 'Keep your arms completely locked in position throughout the arc.'
+      },
+      {
+        id: 'b_08',
+        name: 'Chin-Up',
+        muscle: 'Back',
+        secondary: ['Biceps', 'Chest'],
+        equipment: 'Pull-up Bar',
+        difficulty: 'Intermediate',
+        instructions: [
+          'Grab the pull-up bar with an underhand grip (palms facing you) shoulder-width apart.',
+          'Hang fully with arms extended.',
+          'Pull yourself up until your chin clears the bar, focusing on bicep and lat engagement.',
+          'Lower yourself down with smooth control.'
+        ],
+        tips: 'Underhand grips place a greater emphasis on bicep recruitment alongside the lats.'
+      },
+      {
+        id: 'b_09',
+        name: 'Chest-Supported Dumbbell Row',
+        muscle: 'Back',
+        secondary: ['Biceps', 'Rear Deltoids'],
+        equipment: 'Incline Bench & Dumbbells',
+        difficulty: 'Beginner',
+        instructions: [
+          'Set an incline bench to 45 degrees and lie face down with your chest against the backrest.',
+          'Let dumbbells hang straight down toward the floor.',
+          'Row the dumbbells up toward your hip pockets, squeezing your shoulder blades together.',
+          'Lower down slowly.'
+        ],
+        tips: 'Removing lower back strain allows you to isolate your upper back and lats perfectly.'
+      },
+      {
+        id: 'b_10',
+        name: 'Hyperextension (Back Extension)',
+        muscle: 'Back',
+        secondary: ['Glutes', 'Hamstrings'],
+        equipment: 'Hyperextension Bench',
+        difficulty: 'Beginner',
+        instructions: [
+          'Position your hips on the pad of the hyperextension bench with ankles secured securely behind footpads.',
+          'Lower your upper body forward toward the floor until your torso forms a gentle bend.',
+          'Raise your torso back up until it is in a straight line with your legs.',
+          'Avoid hyperextending or arching backward excessively at the top.'
+        ],
+        tips: 'Focus on squeezing your lower back and glutes to lift your torso.'
+      },
+
+      // ================= SHOULDERS (10) =================
+      {
+        id: 's_01',
+        name: 'Overhead Shoulder Press',
+        muscle: 'Shoulders',
+        secondary: ['Triceps', 'Upper Chest'],
+        equipment: 'Dumbbells or Barbell',
+        difficulty: 'Intermediate',
+        instructions: [
+          'Hold weights at shoulder height with your palms facing forward.',
+          'Brace your core and press the weight straight overhead until arms are locked.',
+          'Lower the weight back down smoothly to shoulder level.'
+        ],
+        tips: 'Do not arch your lower back excessively as you press overhead.'
+      },
+      {
+        id: 's_02',
+        name: 'Dumbbell Lateral Raise',
+        muscle: 'Shoulders',
+        secondary: ['Traps'],
+        equipment: 'Dumbbells',
+        difficulty: 'Beginner',
+        instructions: [
+          'Stand tall holding dumbbells by your sides with a neutral grip.',
+          'Keeping a slight bend in your elbows, raise your arms out to the sides until parallel with the floor.',
+          'Lower the dumbbells slowly back down to your sides.'
+        ],
+        tips: 'Imagine pouring water out of pitchers with your hands at the top to target side delts.'
+      },
+      {
+        id: 's_03',
+        name: 'Dumbbell Front Raise',
+        muscle: 'Shoulders',
+        secondary: ['Upper Pectorals'],
+        equipment: 'Dumbbells',
+        difficulty: 'Beginner',
+        instructions: [
+          'Hold dumbbells in front of your thighs with palms facing backward.',
+          'Keep your arms straight and lift one or both dumbbells forward up to eye level.',
+          'Lower the weight down with slow, controlled movement.'
+        ],
+        tips: 'Avoid using hip momentum or swinging your body to lift the weights.'
+      },
+      {
+        id: 's_04',
+        name: 'Seated Dumbbell Rear Delt Fly',
+        muscle: 'Shoulders',
+        secondary: ['Upper Back', 'Rhomboids'],
+        equipment: 'Dumbbells & Bench',
+        difficulty: 'Intermediate',
+        instructions: [
+          'Sit on the edge of a bench and lean your torso forward over your thighs.',
+          'Hold dumbbells underneath your legs with palms facing each other.',
+          'Raise your arms up and out to the sides, squeezing your rear delts.',
+          'Lower the dumbbells back down smoothly.'
+        ],
+        tips: 'Focus on leading with your pinkies to maximize rear delt engagement.'
+      },
+      {
+        id: 's_05',
+        name: 'Barbell Upright Row',
+        muscle: 'Shoulders',
+        secondary: ['Traps', 'Biceps'],
+        equipment: 'Barbell',
+        difficulty: 'Intermediate',
+        instructions: [
+          'Hold a barbell with an overhand grip slightly narrower than shoulder-width.',
+          'Stand tall and pull the barbell straight up toward your chin, keeping it close to your body.',
+          'Allow your elbows to flare out high and wide.',
+          'Lower the bar back down with control.'
+        ],
+        tips: 'Stop pulling if you feel any impingement or pinching in your shoulder joints.'
+      },
+      {
+        id: 's_06',
+        name: 'Arnold Press',
+        muscle: 'Shoulders',
+        secondary: ['Triceps'],
+        equipment: 'Dumbbells',
+        difficulty: 'Intermediate',
+        instructions: [
+          'Sit on a bench holding dumbbells in front of your chest with palms facing toward you (like the top of a bicep curl).',
+          'Press the weights overhead while rotating your palms outward so they face forward at the top.',
+          'Reverse the rotation as you lower the dumbbells back down.'
+        ],
+        tips: 'The twisting motion recruits all three heads of the deltoid muscle.'
+      },
+      {
+        id: 's_07',
+        name: 'Cable Face Pull',
+        muscle: 'Shoulders',
+        secondary: ['Rear Deltoids', 'Traps', 'Rotator Cuff'],
+        equipment: 'Cable Machine with Rope',
+        difficulty: 'Beginner',
+        instructions: [
+          'Attach a rope handle to a pulley set at face height.',
+          'Grab the rope with both hands, step back, and pull the handles directly toward your face/ears.',
+          'Flare your elbows high and wide, squeezing your upper back.',
+          'Return slowly to full arm extension.'
+        ],
+        tips: 'Essential for maintaining shoulder health and posture balance.'
+      },
+      {
+        id: 's_08',
+        name: 'Barbell Shrug',
+        muscle: 'Shoulders',
+        secondary: ['Traps'],
+        equipment: 'Barbell',
+        difficulty: 'Beginner',
+        instructions: [
+          'Hold a barbell in front of your thighs with an overhand shoulder-width grip.',
+          'Keep your arms straight and elevate your shoulders straight up toward your ears as high as possible.',
+          'Hold the top squeeze for one second, then lower down with control.'
+        ],
+        tips: 'Do not roll your shoulders in circles; move strictly straight up and down.'
+      },
+      {
+        id: 's_09',
+        name: 'Machine Shoulder Press',
+        muscle: 'Shoulders',
+        secondary: ['Triceps'],
+        equipment: 'Shoulder Press Machine',
+        difficulty: 'Beginner',
+        instructions: [
+          'Adjust the seat height so handles are level with your shoulders.',
+          'Grip the handles and press upward until your arms are fully extended overhead.',
+          'Lower the handles back down under control to shoulder level.'
+        ],
+        tips: 'Great for heavy pressing sets safely without needing a spotter.'
+      },
+      {
+        id: 's_10',
+        name: 'Single-Arm Cable Lateral Raise',
+        muscle: 'Shoulders',
+        secondary: ['Traps'],
+        equipment: 'Cable Machine',
+        difficulty: 'Intermediate',
+        instructions: [
+          'Set a cable pulley to the lowest setting and stand sideways to the machine.',
+          'Grab the cable handle with the hand further from the machine, keeping your arm down across your body.',
+          'Raise your arm out to the side until it is parallel with the floor.',
+          'Lower back down slowly.'
+        ],
+        tips: 'Cables provide constant tension throughout the entire range of motion compared to dumbbells.'
+      },
+
+      // ================= BICEPS (10) =================
+      {
+        id: 'bi_01',
+        name: 'Standing Bicep Curl',
+        muscle: 'Biceps',
+        secondary: ['Forearms'],
+        equipment: 'Dumbbells',
+        difficulty: 'Beginner',
+        instructions: [
+          'Stand tall holding dumbbells at your sides with palms facing forward.',
+          'Keeping your elbows pinned to your ribs, curl the weights up toward your shoulders.',
+          'Squeeze your biceps at the top, then slowly lower back down.'
+        ],
+        tips: 'Prevent your elbows from drifting forward during the curl.'
+      },
+      {
+        id: 'bi_02',
+        name: 'Hammer Curl',
+        muscle: 'Biceps',
+        secondary: ['Brachialis', 'Forearms'],
+        equipment: 'Dumbbells',
+        difficulty: 'Beginner',
+        instructions: [
+          'Hold dumbbells at your sides with palms facing each other (neutral grip).',
+          'Keeping your elbows locked in place, curl the weights up toward your shoulders.',
+          'Lower the dumbbells back down slowly.'
+        ],
+        tips: 'The neutral grip builds thickness in both the biceps and forearms.'
+      },
+      {
+        id: 'bi_03',
+        name: 'Incline Dumbbell Curl',
+        muscle: 'Biceps',
+        secondary: ['Forearms'],
+        equipment: 'Dumbbells & Incline Bench',
+        difficulty: 'Intermediate',
+        instructions: [
+          'Set an incline bench to 45-60 degrees and sit back with dumbbells hanging straight down.',
+          'Keep your upper arms stationary and curl the weights upward.',
+          'Squeeze hard at the top and lower back down to get a deep stretch.'
+        ],
+        tips: 'This position places the bicep long head under an intense stretch for maximum growth.'
+      },
+      {
+        id: 'bi_04',
+        name: 'EZ Bar Preacher Curl',
+        muscle: 'Biceps',
+        secondary: ['Forearms'],
+        equipment: 'EZ Bar & Preacher Bench',
+        difficulty: 'Intermediate',
+        instructions: [
+          'Rest your upper arms flat against the preacher bench pad, holding an EZ curl bar.',
+          'Curl the bar upward toward your chin in a smooth arc.',
+          'Lower the bar down until your arms are almost fully extended.'
+        ],
+        tips: 'Do not fully lock out your elbows at the bottom to maintain constant tension.'
+      },
+      {
+        id: 'bi_05',
+        name: 'Concentration Curl',
+        muscle: 'Biceps',
+        secondary: ['Forearms'],
+        equipment: 'Dumbbell & Bench',
+        difficulty: 'Beginner',
+        instructions: [
+          'Sit on a bench with legs spread, resting the back of your right upper arm against the inside of your right thigh.',
+          'Hold a dumbbell and curl it up toward your chest, focusing entirely on the contraction.',
+          'Lower the weight back down with complete control.'
+        ],
+        tips: 'Eliminates all body swing for peak bicep isolation.'
+      },
+      {
+        id: 'bi_06',
+        name: 'Cable Bicep Curl',
+        muscle: 'Biceps',
+        secondary: ['Forearms'],
+        equipment: 'Cable Machine',
+        difficulty: 'Beginner',
+        instructions: [
+          'Attach a straight bar or EZ bar to a low pulley cable station.',
+          'Grab the bar with an underhand grip and stand tall with elbows tucked by your sides.',
+          'Curl the bar upward toward your chest, squeezing your biceps.',
+          'Lower back down slowly.'
+        ],
+        tips: 'Cables provide smooth resistance throughout the entire lifting curve.'
+      },
+      {
+        id: 'bi_07',
+        name: 'Barbell Bicep Curl',
+        muscle: 'Biceps',
+        secondary: ['Forearms'],
+        equipment: 'Barbell',
+        difficulty: 'Intermediate',
+        instructions: [
+          'Hold a barbell with an underhand shoulder-width grip, standing tall.',
+          'Keeping your elbows fixed by your sides, curl the bar up toward your collarbone.',
+          'Lower the bar back down smoothly.'
+        ],
+        tips: 'Allows you to load heavier weight safely to build overall bicep mass.'
+      },
+      {
+        id: 'bi_08',
+        name: 'Zottman Curl',
+        muscle: 'Biceps',
+        secondary: ['Forearms', 'Brachioradialis'],
+        equipment: 'Dumbbells',
+        difficulty: 'Intermediate',
+        instructions: [
+          'Perform a standard bicep curl with palms facing up.',
+          'At the top of the movement, rotate your wrists so your palms face downward.',
+          'Lower the dumbbells down with an overhand grip to target your forearms.'
+        ],
+        tips: 'A fantastic dual-purpose exercise for both biceps and grip strength.'
+      },
+      {
+        id: 'bi_09',
+        name: 'Reverse Barbell Curl',
+        muscle: 'Biceps',
+        secondary: ['Forearms', 'Brachialis'],
+        equipment: 'Barbell',
+        difficulty: 'Intermediate',
+        instructions: [
+          'Hold a barbell with an overhand grip (palms facing down) shoulder-width apart.',
+          'Keep your elbows pinned to your sides and curl the bar upward.',
+          'Lower the bar back down with control.'
+        ],
+        tips: 'Overhand grips shift focus heavily to the forearm extensors and brachialis.'
+      },
+      {
+        id: 'bi_10',
+        name: 'Spider Curl',
+        muscle: 'Biceps',
+        secondary: ['Forearms'],
+        equipment: 'Incline Bench & Barbell/Dumbbells',
+        difficulty: 'Intermediate',
+        instructions: [
+          'Lie face down on an incline bench set to 45 degrees, with your chest and arms hanging freely downward.',
+          'Hold a barbell or dumbbells with an underhand grip.',
+          'Curl the weight up toward your face/chin, keeping your upper arms vertical.',
+          'Lower back down into a full stretch.'
+        ],
+        tips: 'Provides an intense peak contraction directly on the short head of the bicep.'
+      },
+
+      // ================= TRICEPS (10) =================
+      {
+        id: 't_01',
+        name: 'Tricep Pushdown',
+        muscle: 'Triceps',
+        secondary: ['Shoulders'],
+        equipment: 'Cable Machine',
+        difficulty: 'Beginner',
+        instructions: [
+          'Attach a rope or straight bar to a high pulley and grab with both hands.',
+          'Keep your upper arms locked by your sides and push the handle down.',
+          'Fully extend your arms at the bottom, then return with control.'
+        ],
+        tips: 'Keep your torso slightly leaning forward to engage your triceps maximally.'
+      },
+      {
+        id: 't_02',
+        name: 'Skull Crusher (Lying Tricep Extension)',
+        muscle: 'Triceps',
+        secondary: ['Core'],
+        equipment: 'EZ Bar & Bench',
+        difficulty: 'Intermediate',
+        instructions: [
+          'Lie flat on a bench holding an EZ bar with hands shoulder-width apart, arms extended upward.',
+          'Keeping your upper arms stable, bend your elbows to lower the bar toward your forehead.',
+          'Press the bar back up to full extension by contracting your triceps.'
+        ],
+        tips: 'Keep your elbows pointed straight forward toward the ceiling rather than flaring out.'
+      },
+      {
+        id: 't_03',
+        name: 'Overhead Cable Tricep Extension',
+        muscle: 'Triceps',
+        secondary: ['Core'],
+        equipment: 'Cable Machine',
+        difficulty: 'Intermediate',
+        instructions: [
+          'Attach a rope handle to a low or mid pulley, face away from the machine and hold the rope overhead.',
+          'Keep your upper arms close to your ears and press your hands upward and forward.',
+          'Lower the weight back behind your head to feel a deep tricep stretch.'
+        ],
+        tips: 'Great for targeting the long head of the triceps due to the overhead arm position.'
+      },
+      {
+        id: 't_04',
+        name: 'Close-Grip Bench Press',
+        muscle: 'Triceps',
+        secondary: ['Chest', 'Shoulders'],
+        equipment: 'Barbell & Bench',
+        difficulty: 'Intermediate',
+        instructions: [
+          'Lie on a flat bench and grip the barbell with hands spaced about shoulder-width apart or slightly closer.',
+          'Lower the bar down to your lower chest while keeping elbows tucked close to your torso.',
+          'Press the weight back up powerfully to full lockout.'
+        ],
+        tips: 'Do not place your hands too close together to avoid unnecessary wrist and shoulder strain.'
+      },
+      {
+        id: 't_05',
+        name: 'Tricep Kickback',
+        muscle: 'Triceps',
+        secondary: ['Rear Deltoids'],
+        equipment: 'Dumbbells & Bench',
+        difficulty: 'Beginner',
+        instructions: [
+          'Place your left knee and left hand on a bench, holding a dumbbell in your right hand.',
+          'Raise your right upper arm parallel to your torso, keeping your elbow locked in place.',
+          'Extend your arm straight back behind you, squeezing your tricep.',
+          'Return slowly to the starting 90-degree bend.'
+        ],
+        tips: 'Keep your upper arm completely stationary throughout the movement.'
+      },
+      {
+        id: 't_06',
+        name: 'Bench Dip',
+        muscle: 'Triceps',
+        secondary: ['Chest', 'Shoulders'],
+        equipment: 'Bench or Chair',
+        difficulty: 'Beginner',
+        instructions: [
+          'Place your hands on the edge of a bench behind you with legs extended straight out in front.',
+          'Lower your hips toward the floor by bending your elbows to a 90-degree angle.',
+          'Press back up using your triceps until your arms are fully locked.'
+        ],
+        tips: 'Keep your back close to the edge of the bench to protect your shoulder joints.'
+      },
+      {
+        id: 't_07',
+        name: 'Single-Arm Overhead Dumbbell Extension',
+        muscle: 'Triceps',
+        secondary: ['Core'],
+        equipment: 'Dumbbell',
+        difficulty: 'Beginner',
+        instructions: [
+          'Sit or stand holding a single dumbbell with one hand overhead.',
+          'Lower the dumbbell behind your head by bending your elbow.',
+          'Press the weight straight back up to full overhead extension.',
+          'Complete all reps before switching arms.'
+        ],
+        tips: 'Support your working arm gently with your opposite hand if needed for stability.'
+      },
+      {
+        id: 't_08',
+        name: 'Tricep Dips (Parallel Bars)',
+        muscle: 'Triceps',
+        secondary: ['Chest', 'Shoulders'],
+        equipment: 'Parallel Bars',
+        difficulty: 'Advanced',
+        instructions: [
+          'Mount parallel bars with your arms locked out and body upright.',
+          'Keep your torso vertical (avoiding the forward lean used for chest dips).',
+          'Lower your body until your upper arms are parallel to the floor.',
+          'Press back up forcefully to full lockout.'
+        ],
+        tips: 'A vertical posture isolates the triceps significantly more than a forward lean.'
+      },
+      {
+        id: 't_09',
+        name: 'Reverse-Grip Tricep Pushdown',
+        muscle: 'Triceps',
+        secondary: ['Forearms'],
+        equipment: 'Cable Machine',
+        difficulty: 'Intermediate',
+        instructions: [
+          'Attach a straight bar to a high pulley and grab with an underhand grip (palms facing up).',
+          'Keep elbows pinned to your sides and push the bar down.',
+          'Fully extend your arms at the bottom, then return with control.'
+        ],
+        tips: 'Underhand grip places unique tension on the medial and lateral heads of the tricep.'
+      },
+      {
+        id: 't_10',
+        name: 'Floor Press',
+        muscle: 'Triceps',
+        secondary: ['Chest', 'Shoulders'],
+        equipment: 'Barbell or Dumbbells',
+        difficulty: 'Intermediate',
+        instructions: [
+          'Lie flat on the floor with knees bent, holding a barbell or dumbbells above your chest.',
+          'Lower the weight down until your triceps rest flat on the floor for a brief pause.',
+          'Press the weight explosive back up to full lockout.'
+        ],
+        tips: 'The floor stops your range of motion at the bottom, putting maximum emphasis on tricep lockout strength.'
+      },
+
+      // ================= ABS (10) =================
+      {
+        id: 'a_01',
+        name: 'Hanging Leg Raise',
+        muscle: 'Abs',
+        secondary: ['Hip Flexors'],
+        equipment: 'Pull-up Bar',
+        difficulty: 'Intermediate',
+        instructions: [
+          'Hang from a pull-up bar with an overhand grip.',
+          'Keeping your legs straight or knees tucked, raise them up toward your chest.',
+          'Lower your legs slowly without swinging.'
+        ],
+        tips: 'Focus on curling your pelvis upward at the top to fully contract the lower abs.'
+      },
+      {
+        id: 'a_02',
+        name: 'Cable Woodchopper',
+        muscle: 'Abs',
+        secondary: ['Obliques', 'Core'],
+        equipment: 'Cable Machine',
+        difficulty: 'Intermediate',
+        instructions: [
+          'Set a cable pulley to a high position and grab the handle with both hands sideways to the machine.',
+          'Rotate your torso and pull the cable diagonally down across your body toward your opposite hip.',
+          'Return slowly to the starting position with control.'
+        ],
+        tips: 'Keep your arms relatively straight and generate the twist using your core and obliques.'
+      },
+      {
+        id: 'a_03',
+        name: 'Plank',
+        muscle: 'Abs',
+        secondary: ['Lower Back', 'Shoulders'],
+        equipment: 'Bodyweight',
+        difficulty: 'Beginner',
+        instructions: [
+          'Rest on your forearms and toes with elbows directly beneath your shoulders.',
+          'Engage your core, glutes, and quads to keep your body in a straight line.',
+          'Hold this position steadily while breathing normally.'
+        ],
+        tips: 'Do not let your hips sag toward the floor or pike upward in the air.'
+      },
+      {
+        id: 'a_04',
+        name: 'Russian Twist',
+        muscle: 'Abs',
+        secondary: ['Obliques'],
+        equipment: 'Bodyweight or Medicine Ball',
+        difficulty: 'Beginner',
+        instructions: [
+          'Sit on the floor with knees bent, leaning your torso back slightly at a 45-degree angle.',
+          'Lift your feet slightly off the floor for an extra challenge.',
+          'Rotate your torso from side to side, touching your hands or weight to the floor beside your hip.'
+        ],
+        tips: 'Move with control and focus on the oblique twist rather than rushing through reps.'
+      },
+      {
+        id: 'a_05',
+        name: 'Bicycle Crunch',
+        muscle: 'Abs',
+        secondary: ['Obliques'],
+        equipment: 'Bodyweight',
+        difficulty: 'Beginner',
+        instructions: [
+          'Lie flat on your back with hands gently behind your head and knees lifted, shins parallel to the floor.',
+          'Bring your right elbow toward your left knee while extending your right leg straight out.',
+          'Alternate sides in a smooth, cycling motion.'
+        ],
+        tips: 'Focus on shoulder rotation rather than pulling on your neck with your hands.'
+      },
+      {
+        id: 'a_06',
+        name: 'Ab Wheel Rollout',
+        muscle: 'Abs',
+        secondary: ['Lats', 'Lower Back'],
+        equipment: 'Ab Roller Wheel',
+        difficulty: 'Advanced',
+        instructions: [
+          'Kneel on the floor holding the ab wheel handles directly beneath your shoulders.',
+          'Brace your core tightly and roll the wheel forward until your body is nearly parallel to the floor.',
+          'Use your abs to pull the wheel back to the starting kneeling position.'
+        ],
+        tips: 'Never let your lower back arch or sag during any part of the rollout.'
+      },
+      {
+        id: 'a_07',
+        name: 'Decline Crunch',
+        muscle: 'Abs',
+        secondary: ['Hip Flexors'],
+        equipment: 'Decline Bench',
+        difficulty: 'Intermediate',
+        instructions: [
+          'Secure your feet at the top of a decline bench and lie back.',
+          'Place hands across your chest or behind your head.',
+          'Curl your shoulders and torso up toward your knees, contracting your abs hard.',
+          'Lower back down with control.'
+        ],
+        tips: 'The decline angle increases range of motion for a deeper abdominal contraction.'
+      },
+      {
+        id: 'a_08',
+        name: 'Mountain Climber',
+        muscle: 'Abs',
+        secondary: ['Shoulders', 'Cardio'],
+        equipment: 'Bodyweight',
+        difficulty: 'Beginner',
+        instructions: [
+          'Get into a high plank position with hands under shoulders.',
+          'Drive one knee forward toward your chest, then quickly switch legs in a running motion.',
+          'Keep your hips level and core engaged throughout.'
+        ],
+        tips: 'Maintains elevated heart rate while taxing your core stabilization.'
+      },
+      {
+        id: 'a_09',
+        name: 'Leg Raise (Floor)',
+        muscle: 'Abs',
+        secondary: ['Hip Flexors'],
+        equipment: 'Bodyweight & Mat',
+        difficulty: 'Beginner',
+        instructions: [
+          'Lie flat on your back with hands tucked under your glutes for lower back support.',
+          'Keeping your legs straight, raise them up toward the ceiling until vertical.',
+          'Lower your legs slowly back down just above the floor without touching it.'
+        ],
+        tips: 'Press your lower back firmly into the mat to prevent arching.'
+      },
+      {
+        id: 'a_10',
+        name: 'Side Plank',
+        muscle: 'Abs',
+        secondary: ['Obliques', 'Shoulders'],
+        equipment: 'Bodyweight',
+        difficulty: 'Beginner',
+        instructions: [
+          'Lie on your side with your forearm directly beneath your shoulder and feet stacked or staggered.',
+          'Lift your hips off the floor until your body forms a straight, diagonal line from head to toes.',
+          'Hold this position steadily, then switch sides.'
+        ],
+        tips: 'Engage your glutes and obliques to keep your hips from dipping downward.'
+      }
+    ];
+
+    const MUSCLE_GROUPS = ['All', 'Chest', 'Legs', 'Back', 'Shoulders', 'Biceps', 'Triceps', 'Abs'];
+
+    function App() {
+      const [activeTab, setActiveTab] = useState('explore');
+      const [selectedMuscle, setSelectedMuscle] = useState('All');
+      const [selectedExercise, setSelectedExercise] = useState(null);
+      
+      const [genGoal, setGenGoal] = useState('Build Muscle');
+      const [genEquipment, setGenEquipment] = useState('Full Gym');
+      const [generatedRoutine, setGeneratedRoutine] = useState(null);
+
+      // Tracker State
+      const [workoutLog, setWorkoutLog] = useState([]);
+      const [trackerExercise, setTrackerExercise] = useState(EXERCISES_DATA[0].name);
+      const [trackerWeight, setTrackerWeight] = useState('');
+      const [trackerReps, setTrackerReps] = useState('');
+
+      // Rest Timer State
+      const [timeLeft, setTimeLeft] = useState(0);
+      const [isTimerRunning, setIsTimerRunning] = useState(false);
+
+      useEffect(() => {
+        let interval = null;
+        if (isTimerRunning && timeLeft > 0) {
+          interval = setInterval(() => {
+            setTimeLeft(prev => prev - 1);
+          }, 1000);
+        } else if (timeLeft === 0) {
+          setIsTimerRunning(false);
+        }
+        return () => clearInterval(interval);
+      }, [isTimerRunning, timeLeft]);
+
+      const startTimer = (seconds) => {
+        setTimeLeft(seconds);
+        setIsTimerRunning(true);
+      };
+
+      const filteredExercises = selectedMuscle === 'All' 
+        ? EXERCISES_DATA 
+        : EXERCISES_DATA.filter(ex => ex.muscle === selectedMuscle);
+
+      const handleGenerateWorkout = (e) => {
+        e.preventDefault();
+        const routine = EXERCISES_DATA.slice(0, 4);
+        setGeneratedRoutine(routine);
+      };
+
+      const handleAddSet = (e) => {
+        e.preventDefault();
+        if (!trackerWeight || !trackerReps) return;
+
+        const newSet = {
+          id: Date.now(),
+          exercise: trackerExercise,
+          weight: parseFloat(trackerWeight),
+          reps: parseInt(trackerReps),
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
+
+        setWorkoutLog([newSet, ...workoutLog]);
+        setTrackerWeight('');
+        setTrackerReps('');
+        startTimer(60); 
+      };
+
+      const handleRemoveSet = (id) => {
+        setWorkoutLog(workoutLog.filter(item => item.id !== id));
+      };
+
+      return (
+        <div className="min-h-screen bg-slate-950 text-slate-100 font-sans antialiased p-4">
+          <header className="max-w-4xl mx-auto border-b border-slate-800/80 pb-4 mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center space-x-2">
+              <span className="text-2xl font-black bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-400 bg-clip-text text-transparent">FormFit</span>
+              <span className="text-xs bg-orange-500/10 text-orange-400 border border-orange-500/20 px-2 py-0.5 rounded-full font-medium">v3.0 Mega</span>
+            </div>
+            <nav className="flex flex-wrap justify-center gap-1.5 bg-slate-900/80 p-1.5 rounded-2xl border border-slate-800">
+              <button 
+                onClick={() => { setActiveTab('explore'); setSelectedExercise(null); }}
+                className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${activeTab === 'explore' ? 'bg-orange-600 text-white shadow-lg shadow-orange-600/30' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}
+              >
+                Library
+              </button>
+              <button 
+                onClick={() => { setActiveTab('generator'); setSelectedExercise(null); }}
+                className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${activeTab === 'generator' ? 'bg-orange-600 text-white shadow-lg shadow-orange-600/30' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}
+              >
+                Generator
+              </button>
+              <button 
+                onClick={() => { setActiveTab('tracker'); setSelectedExercise(null); }}
+                className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${activeTab === 'tracker' ? 'bg-orange-600 text-white shadow-lg shadow-orange-600/30' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}
+              >
+                Tracker
+              </button>
+              <button 
+                onClick={() => { setActiveTab('stats'); setSelectedExercise(null); }}
+                className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${activeTab === 'stats' ? 'bg-orange-600 text-white shadow-lg shadow-orange-600/30' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}
+              >
+                Stats
+              </button>
+              <button 
+                onClick={() => { setActiveTab('creator'); setSelectedExercise(null); }}
+                className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${activeTab === 'creator' ? 'bg-orange-600 text-white shadow-lg shadow-orange-600/30' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}
+              >
+                Creator
+              </button>
+            </nav>
+          </header>
+
+          <main className="max-w-4xl mx-auto">
+            {isTimerRunning && (
+              <div className="mb-6 bg-gradient-to-r from-orange-600/20 via-amber-500/20 to-orange-600/20 border border-orange-500/40 rounded-2xl p-4 flex items-center justify-between shadow-xl animate-pulse">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-orange-600 text-white font-bold flex items-center justify-center text-sm shadow-md">
+                    ⏱️
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-orange-400">Rest Timer Active</h4>
+                    <p className="text-xs text-slate-300">Catch your breath before the next set!</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <span className="text-2xl font-black text-amber-400">{timeLeft}s</span>
+                  <button 
+                    onClick={() => setIsTimerRunning(false)}
+                    className="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700"
+                  >
+                    Skip
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {selectedExercise ? (
+              <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl">
+                <button 
+                  onClick={() => setSelectedExercise(null)}
+                  className="text-sm font-semibold text-orange-400 hover:text-orange-300 mb-6 flex items-center gap-1 transition-colors"
+                >
+                  ← Back to Library
+                </button>
+                
+                <div className="flex flex-wrap items-center gap-3 mb-3">
+                  <span className="bg-orange-500/10 text-orange-400 text-xs px-3 py-1 rounded-full font-semibold border border-orange-500/20">
+                    {selectedExercise.muscle}
+                  </span>
+                  <span className="bg-slate-800 text-slate-300 text-xs px-3 py-1 rounded-full font-medium">
+                    {selectedExercise.difficulty}
+                  </span>
+                  <span className="bg-slate-800 text-slate-300 text-xs px-3 py-1 rounded-full font-medium">
+                    {selectedExercise.equipment}
+                  </span>
+                </div>
+
+                <h1 className="text-3xl font-bold mb-4">{selectedExercise.name}</h1>
+                
+                <div className="mb-6">
+                  <h3 className="text-sm uppercase tracking-wider text-slate-400 font-semibold mb-2">Secondary Muscles</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedExercise.secondary.map((m, i) => (
+                      <span key={i} className="text-xs bg-slate-800/80 text-slate-300 px-2.5 py-1 rounded-md">{m}</span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mb-8">
+                  <h3 className="text-lg font-semibold mb-3 text-orange-400">Step-by-Step Instructions</h3>
+                  <ol className="space-y-3">
+                    {selectedExercise.instructions.map((step, idx) => (
+                      <li key={idx} className="flex items-start gap-3 bg-slate-950/50 p-4 rounded-xl border border-slate-800/60">
+                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-orange-600/20 text-orange-400 text-xs font-bold flex items-center justify-center border border-orange-500/30">
+                          {idx + 1}
+                        </span>
+                        <p className="text-slate-300 text-sm leading-relaxed">{step}</p>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+
+                <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-amber-400 mb-1">Pro Form Tip</h4>
+                  <p className="text-sm text-amber-200/90">{selectedExercise.tips}</p>
+                </div>
+              </div>
+            ) : activeTab === 'explore' ? (
+              <div>
+                <div className="mb-8">
+                  <h1 className="text-3xl font-bold mb-2">Massive Exercise Library (70 Exercises)</h1>
+                  <p className="text-slate-400 text-sm">Select any muscle group below to explore 10 detailed professional guides with correct forms.</p>
+                </div>
+
+                <div className="flex overflow-x-auto pb-4 gap-2 mb-8">
+                  {MUSCLE_GROUPS.map((muscle) => (
+                    <button
+                      key={muscle}
+                      onClick={() => setSelectedMuscle(muscle)}
+                      className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${selectedMuscle === muscle ? 'bg-orange-600 text-white shadow-md shadow-orange-600/30' : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200'}`}
+                    >
+                      {muscle}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {filteredExercises.map((ex) => (
+                    <div 
+                      key={ex.id}
+                      onClick={() => setSelectedExercise(ex)}
+                      className="bg-slate-900 border border-slate-800 hover:border-orange-500/50 rounded-2xl p-5 cursor-pointer transition-all hover:shadow-xl group"
+                    >
+                      <div className="flex justify-between items-start mb-3">
+                        <span className="text-xs font-bold uppercase tracking-wider text-orange-400 bg-orange-500/10 px-2.5 py-1 rounded-md border border-orange-500/20">
+                          {ex.muscle}
+                        </span>
+                        <span className="text-xs text-slate-500 group-hover:text-orange-400 transition-colors">
+                          View Guide →
+                        </span>
+                      </div>
+                      <h3 className="text-lg font-bold mb-2 group-hover:text-orange-400 transition-colors">{ex.name}</h3>
+                      <p className="text-xs text-slate-400 line-clamp-2">{ex.instructions[0]}</p>
+                      
+                      <div className="mt-4 pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-500">
+                        <span>{ex.equipment}</span>
+                        <span className="font-medium text-slate-400">{ex.difficulty}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : activeTab === 'generator' ? (
+              <div className="max-w-xl mx-auto bg-slate-900 border border-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl">
+                <h1 className="text-2xl font-bold mb-2">Smart Workout Generator</h1>
+                <p className="text-slate-400 text-sm mb-6">Customize your parameters to instantly generate a tailored routine.</p>
+                
+                <form onSubmit={handleGenerateWorkout} className="space-y-6">
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Primary Fitness Goal</label>
+                    <select 
+                      value={genGoal} 
+                      onChange={(e) => setGenGoal(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500 text-slate-200"
+                    >
+                      <option value="Build Muscle">Build Muscle & Hypertrophy</option>
+                      <option value="Tone & Sculpt">Tone & Sculpt Physique</option>
+                      <option value="Strength">Increase Raw Strength</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Available Equipment</label>
+                    <select 
+                      value={genEquipment} 
+                      onChange={(e) => setGenEquipment(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500 text-slate-200"
+                    >
+                      <option value="Full Gym">Full Gym Equipment</option>
+                      <option value="Dumbbells Only">Dumbbells Only</option>
+                      <option value="Bodyweight">Bodyweight / Calisthenics</option>
+                    </select>
+                  </div>
+
+                  <button 
+                    type="submit"
+                    className="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold py-3.5 rounded-xl text-sm transition-all shadow-lg shadow-orange-600/25"
+                  >
+                    Generate Custom Routine
+                  </button>
+                </form>
+
+                {generatedRoutine && (
+                  <div className="mt-8 pt-8 border-t border-slate-800">
+                    <h3 className="text-lg font-bold mb-4 text-orange-400">Your Custom Routine</h3>
+                    <div className="space-y-3">
+                      {generatedRoutine.map((item, idx) => (
+                        <div key={idx} className="bg-slate-950 border border-slate-800 p-4 rounded-xl flex items-center justify-between">
+                          <div>
+                            <h4 className="font-semibold text-sm">{item.name}</h4>
+                            <span className="text-xs text-orange-400">{item.muscle} • 3 Sets x 10-12 Reps</span>
+                          </div>
+                          <button 
+                            onClick={() => setSelectedExercise(item)}
+                            className="text-xs bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg text-slate-300 font-medium transition-colors"
+                          >
+                            View
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : activeTab === 'tracker' ? (
+              <div className="max-w-2xl mx-auto bg-slate-900 border border-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl">
+                <div className="flex justify-between items-center mb-2">
+                  <h1 className="text-2xl font-bold">Live Workout Tracker</h1>
+                  <div className="flex gap-2">
+                    <button onClick={() => startTimer(30)} className="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg">30s Rest</button>
+                    <button onClick={() => startTimer(60)} className="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg">60s Rest</button>
+                    <button onClick={() => startTimer(90)} className="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg">90s Rest</button>
+                  </div>
+                </div>
+                <p className="text-slate-400 text-sm mb-6">Log your sets, weights, and reps during your gym session.</p>
+
+                <form onSubmit={handleAddSet} className="bg-slate-950 border border-slate-800 p-5 rounded-2xl mb-8 space-y-4">
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Select Exercise</label>
+                    <select 
+                      value={trackerExercise} 
+                      onChange={(e) => setTrackerExercise(e.target.value)}
+                      className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500 text-slate-200"
+                    >
+                      {EXERCISES_DATA.map(ex => (
+                        <option key={ex.id} value={ex.name}>{ex.name}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Weight (lbs/kg)</label>
+                      <input 
+                        type="number" 
+                        placeholder="e.g. 135"
+                        value={trackerWeight}
+                        onChange={(e) => setTrackerWeight(e.target.value)}
+                        className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500 text-slate-200"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Reps</label>
+                      <input 
+                        type="number" 
+                        placeholder="e.g. 10"
+                        value={trackerReps}
+                        onChange={(e) => setTrackerReps(e.target.value)}
+                        className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500 text-slate-200"
+                      />
+                    </div>
+                  </div>
+
+                  <button 
+                    type="submit"
+                    className="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-lg shadow-orange-600/20"
+                  >
+                    + Log Set & Start Rest Timer
+                  </button>
+                </form>
+
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-bold text-orange-400">Session Log History</h3>
+                    <span className="text-xs bg-slate-800 text-slate-300 px-3 py-1 rounded-full font-medium">
+                      {workoutLog.length} sets logged
+                    </span>
+                  </div>
+
+                  {workoutLog.length === 0 ? (
+                    <div className="text-center py-10 bg-slate-950/40 rounded-2xl border border-dashed border-slate-800 text-slate-500 text-sm">
+                      No sets logged yet. Fill out the form above to record your sets!
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {workoutLog.map((log) => (
+                        <div key={log.id} className="bg-slate-950 border border-slate-800 p-4 rounded-xl flex items-center justify-between">
+                          <div>
+                            <h4 className="font-semibold text-sm text-slate-200">{log.exercise}</h4>
+                            <span className="text-xs text-orange-400 font-medium">
+                              {log.weight} units × {log.reps} reps
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <span className="text-xs text-slate-500">{log.timestamp}</span>
+                            <button 
+                              onClick={() => handleRemoveSet(log.id)}
+                              className="text-xs text-red-400 hover:text-red-300 bg-red-500/10 border border-red-500/20 px-2.5 py-1 rounded-lg transition-colors"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : activeTab === 'stats' ? (
+              <div className="max-w-xl mx-auto bg-slate-900 border border-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl">
+                <h1 className="text-2xl font-bold mb-2">Workout Stats & Overview</h1>
+                <p className="text-slate-400 text-sm mb-6">Review your daily training volume and milestones.</p>
+                
+                <div className="grid grid-cols-2 gap-4 mb-6">
+                  <div className="bg-slate-950 border border-slate-800 p-5 rounded-2xl">
+                    <span className="text-xs uppercase tracking-wider text-slate-400 font-bold">Total Sets Logged</span>
+                    <h3 className="text-3xl font-black text-orange-400 mt-2">{workoutLog.length}</h3>
+                  </div>
+                  <div className="bg-slate-950 border border-slate-800 p-5 rounded-2xl">
+                    <span className="text-xs uppercase tracking-wider text-slate-400 font-bold">Exercises Available</span>
+                    <h3 className="text-3xl font-black text-amber-400 mt-2">{EXERCISES_DATA.length}</h3>
+                  </div>
+                </div>
+
+                <div className="bg-orange-500/10 border border-orange-500/20 rounded-2xl p-5">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-orange-400 mb-1">Consistency Badge</h4>
+                  <p className="text-sm text-orange-200/90">Keep logging your sets in the Tracker tab to build up your streak!</p>
+                </div>
+              </div>
+            ) : (
+              <div className="max-w-xl mx-auto bg-slate-900 border border-slate-800 rounded-3xl p-6 md:p-8 text-center shadow-2xl">
+                <div className="w-20 h-20 bg-orange-600/20 text-orange-400 rounded-full flex items-center justify-center text-3xl font-black mx-auto mb-4 border border-orange-500/30 shadow-lg shadow-orange-600/20">
+                  T
+                </div>
+                <h1 className="text-2xl font-bold mb-1">About the Creator</h1>
+                <p className="text-slate-400 text-sm mb-6">Meet the developer behind FormFit!</p>
+                
+                <div className="bg-slate-950 border border-slate-800 p-6 rounded-2xl space-y-4 text-left shadow-inner">
+                  <div className="flex justify-between items-center border-b border-slate-800 pb-3">
+                    <span className="text-xs uppercase tracking-wider text-slate-400 font-bold">Developer Name</span>
+                    <span className="text-sm font-bold text-orange-400">Tejas</span>
+                  </div>
+                  <div className="flex justify-between items-center border-b border-slate-800 pb-3">
+                    <span className="text-xs uppercase tracking-wider text-slate-400 font-bold">School</span>
+                    <span className="text-sm font-bold text-slate-200">VIDYA SOUDHA PUBLIC SCHOOL</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs uppercase tracking-wider text-slate-400 font-bold">Classroom</span>
+                    <span className="text-sm font-bold text-slate-200">8D</span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </main>
+        </div>
+      );
+    }
+
+    ReactDOM.render(<App />, document.getElementById('root'));
+  </script>
+</body>
+</html>
